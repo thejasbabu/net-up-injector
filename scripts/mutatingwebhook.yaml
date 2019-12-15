@@ -1,0 +1,22 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: net-up-injector-cfg
+  labels:
+    app: net-up-injector
+webhooks:
+  - name: net-up-injector.thejasbabu.com
+    clientConfig:
+      service:
+        name: net-up-injector-svc
+        namespace: test
+        path: "/mutate"
+      caBundle: ${CA_BUNDLE}
+    rules:
+      - operations: [ "CREATE" ]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+    namespaceSelector:
+      matchLabels:
+        net-up-injector: enabled

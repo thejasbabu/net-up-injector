@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: net-up-injector-deployment
+  labels:
+    app: net-up-injector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: net-up-injector
+  template:
+    metadata:
+      labels:
+        app: net-up-injector
+    spec:
+      containers:
+        - name: net-up-injector
+          image: thejasb/net-up-injector
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SIDECAR_CONTAINER_IMAGE
+              value: "thejasb/net-up"
+            - name: SIDE_CAR_TEMPLATE_FILE
+              value: "/etc/webhook/config/sidecarconfig.yaml"
+            - name: LOG_LEVEL
+              value: "debug"
+            - name: CERT_FILE
+              valueFrom:
+                secretKeyRef:
+                  name: net-up-injector-certs
+                  key: cert.pem
+            - name: CERT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: net-up-injector-certs
+                  key: key.pem
+          volumeMounts:
+            - name: webhook-config
+              mountPath: /etc/webhook/config
+      volumes:
+        - name: webhook-config
+          configMap:
+            name: net-up-injector-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: net-up-injector-svc
+  labels:
+    app: net-up-injector
+spec:
+  ports:
+    - port: 443
+      targetPort: 443
+  selector:
+    app: net-up-injector

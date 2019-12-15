@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: net-up-injector-configmap
+data:
+  sidecarconfig.yaml: |
+        name: net-up-sniffer
+        image: {{ .Image }}
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: NET_FILTER
+            value: {{ .BPFExpr }}
+          - name: NET_LOGLEVEL
+            value: {{ .LogLevel }}
+          - name: NET_NETWORKDEVISE
+            value: {{ .NetworkInterface }}
+          - name: NET_OUTPUT
+            value: {{ .Output }}
