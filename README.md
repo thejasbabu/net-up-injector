@@ -1,4 +1,4 @@
-# K8s Admission web-hook
+# Net-up sidecar injector
 
 This uses the `MutatingAdmissionWebhook` to mutate the kubernetes resources based on labels and annotations.
 
